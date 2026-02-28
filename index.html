@@ -308,6 +308,83 @@
             color: var(--text-light);
         }
 
+        /* --- Product Modal (Popup) --- */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+        }
+
+        .modal-content {
+            background-color: var(--white);
+            width: 90%;
+            max-width: 800px;
+            padding: 40px;
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        .modal-overlay.show .modal-content {
+            transform: translateY(0);
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 28px;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close-modal:hover {
+            color: var(--text-dark);
+        }
+
+        .modal-details h2 {
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .modal-details .modal-desc {
+            color: var(--text-light);
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .modal-details .modal-full-desc {
+            font-size: 14px;
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+
+        .modal-details .wholesale-price {
+            font-size: 18px;
+            color: var(--light-gold);
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
         /* --- Footer --- */
         footer {
             background-color: var(--white);
@@ -349,6 +426,13 @@
             .hero h1 { font-size: 36px; }
             .about-grid, .contact-grid { grid-template-columns: 1fr; }
             .trust-elements { flex-direction: column; gap: 20px; }
+            .modal-content { 
+                grid-template-columns: 1fr; 
+                gap: 20px; 
+                padding: 30px 20px;
+                max-height: 90vh;
+                overflow-y: auto;
+            }
         }
     </style>
 </head>
@@ -380,28 +464,7 @@
 
             <div class="container">
                 <h2 class="section-title">Featured Pieces</h2>
-                <div class="product-grid">
-                    <div class="product-card">
-                        <div class="img-placeholder">[ Ring Image ]</div>
-                        <h3>Eternity Band</h3>
-                        <p>18k Solid Gold</p>
-                    </div>
-                    <div class="product-card">
-                        <div class="img-placeholder">[ Necklace Image ]</div>
-                        <h3>Pearl Drop Pendant</h3>
-                        <p>Freshwater Pearl & Gold</p>
-                    </div>
-                    <div class="product-card">
-                        <div class="img-placeholder">[ Bracelet Image ]</div>
-                        <h3>Minimalist Cuff</h3>
-                        <p>Sterling Silver</p>
-                    </div>
-                    <div class="product-card">
-                        <div class="img-placeholder">[ Earrings Image ]</div>
-                        <h3>Stud Collection</h3>
-                        <p>Diamond Accents</p>
-                    </div>
-                </div>
+                <div class="product-grid" id="featured-grid"></div>
             </div>
         </section>
 
@@ -448,8 +511,7 @@
                     <button class="filter-btn" onclick="filterCategory('bracelets')">Bracelets</button>
                 </div>
 
-                <div class="product-grid" id="catalog-grid">
-                    </div>
+                <div class="product-grid" id="catalog-grid"></div>
             </div>
         </section>
 
@@ -491,6 +553,18 @@
 
     </main>
 
+    <div class="modal-overlay" id="productModal" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()"> <span class="close-modal" onclick="closeModal()">&times;</span>
+            <div class="img-placeholder" id="modalImg" style="margin-bottom: 0;"></div>
+            <div class="modal-details">
+                <h2 id="modalTitle">Product Title</h2>
+                <div class="modal-desc" id="modalDesc">Short Desc</div>
+                <div class="modal-full-desc" id="modalFullDesc">Detailed description of the jewellery piece goes here.</div>
+                <div class="wholesale-price" id="modalPrice">Est. Wholesale: $0.00</div>
+            </div>
+        </div>
+    </div>
+
     <footer>
         <div class="footer-content">
             <h3 style="font-size: 20px; margin-bottom: 20px;">AURA.</h3>
@@ -509,63 +583,104 @@
     <script>
         // --- Single Page Application Routing ---
         function navigate(pageId) {
-            // Hide all sections
             const sections = document.querySelectorAll('.page-section');
             sections.forEach(section => section.classList.remove('active'));
             
-            // Show target section
             document.getElementById(pageId).classList.add('active');
 
-            // Update nav links active state
             const navLinks = document.querySelectorAll('.nav-links a');
             navLinks.forEach(link => link.classList.remove('active'));
             document.getElementById('nav-' + pageId).classList.add('active');
 
-            // Scroll to top cleanly
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // --- Product Data & Filtering ---
+        // --- Product Data with Added Detail info ---
         const products = [
-            { name: 'Twisted Gold Ring', category: 'rings', desc: '14k Yellow Gold', img: '[ Ring Image ]' },
-            { name: 'Classic Signet', category: 'rings', desc: 'Sterling Silver', img: '[ Ring Image ]' },
-            { name: 'Herringbone Chain', category: 'necklaces', desc: '18k Gold Plated', img: '[ Necklace Image ]' },
-            { name: 'Layered Coin Pendant', category: 'necklaces', desc: 'Vintage Finish', img: '[ Necklace Image ]' },
-            { name: 'Beaded Cuff', category: 'bracelets', desc: 'Rose Gold', img: '[ Bracelet Image ]' },
-            { name: 'Chain Link Bracelet', category: 'bracelets', desc: 'Solid Brass', img: '[ Bracelet Image ]' }
+            { id: 1, name: 'Eternity Band', category: 'rings', desc: '18k Solid Gold', fullDesc: 'A continuous circle of brilliant-cut diamonds set in 18k solid gold. Perfect for stacking or wearing on its own.', price: 'Wholesale: $250.00', img: '[ Ring Image ]' },
+            { id: 2, name: 'Pearl Drop Pendant', category: 'necklaces', desc: 'Freshwater Pearl & Gold', fullDesc: 'A delicate 14k gold chain featuring a single, lustrous freshwater pearl drop. Elegant and timeless.', price: 'Wholesale: $110.00', img: '[ Necklace Image ]' },
+            { id: 3, name: 'Minimalist Cuff', category: 'bracelets', desc: 'Sterling Silver', fullDesc: 'A sleek, open-ended cuff crafted from high-polished sterling silver. Adjustable for the perfect fit.', price: 'Wholesale: $85.00', img: '[ Bracelet Image ]' },
+            { id: 4, name: 'Stud Collection', category: 'rings', desc: 'Diamond Accents', fullDesc: 'A versatile set of everyday stud earrings with subtle diamond accents. Hypoallergenic and secure.', price: 'Wholesale: $190.00', img: '[ Earrings Image ]' },
+            { id: 5, name: 'Herringbone Chain', category: 'necklaces', desc: '18k Gold Plated', fullDesc: 'A liquid-like flat herringbone chain that sits perfectly on the collarbone. Tarnish-resistant plating.', price: 'Wholesale: $65.00', img: '[ Necklace Image ]' },
+            { id: 6, name: 'Chain Link Bracelet', category: 'bracelets', desc: 'Solid Brass', fullDesc: 'A bold, vintage-inspired chunky chain link bracelet. Finished with a secure toggle clasp.', price: 'Wholesale: $45.00', img: '[ Bracelet Image ]' }
         ];
 
+        // --- Render Products ---
         function renderProducts(filter) {
             const grid = document.getElementById('catalog-grid');
-            grid.innerHTML = ''; // Clear current
+            grid.innerHTML = ''; 
 
             const filtered = filter === 'all' ? products : products.filter(p => p.category === filter);
 
             filtered.forEach(p => {
-                const card = document.createElement('div');
-                card.className = 'product-card';
-                card.innerHTML = `
-                    <div class="img-placeholder">${p.img}</div>
-                    <h3>${p.name}</h3>
-                    <p>${p.desc}</p>
-                    <a href="#" class="btn" style="padding: 8px 20px; font-size: 12px;" onclick="event.preventDefault()">View Details</a>
-                `;
-                grid.appendChild(card);
+                grid.innerHTML += createProductCard(p);
             });
         }
 
+        // --- Render Featured Home Products ---
+        function renderFeatured() {
+            const featuredGrid = document.getElementById('featured-grid');
+            featuredGrid.innerHTML = '';
+            // Display first 4 products on the home page
+            const featured = products.slice(0, 4);
+            featured.forEach(p => {
+                featuredGrid.innerHTML += createProductCard(p);
+            });
+        }
+
+        function createProductCard(p) {
+            return `
+                <div class="product-card">
+                    <div class="img-placeholder">${p.img}</div>
+                    <h3>${p.name}</h3>
+                    <p>${p.desc}</p>
+                    <a href="#" class="btn" style="padding: 8px 20px; font-size: 12px;" onclick="event.preventDefault(); openModal(${p.id})">View Details</a>
+                </div>
+            `;
+        }
+
         function filterCategory(category) {
-            // Update button active states
             const buttons = document.querySelectorAll('.filter-btn');
             buttons.forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
 
-            // Re-render
             renderProducts(category);
+        }
+
+        // --- Modal Functions ---
+        function openModal(id) {
+            const product = products.find(p => p.id === id);
+            if(!product) return;
+
+            // Populate Data
+            document.getElementById('modalImg').innerText = product.img;
+            document.getElementById('modalTitle').innerText = product.name;
+            document.getElementById('modalDesc').innerText = product.desc;
+            document.getElementById('modalFullDesc').innerText = product.fullDesc;
+            document.getElementById('modalPrice').innerText = product.price;
+
+            // Show Modal with animation
+            const modal = document.getElementById('productModal');
+            modal.style.display = 'flex';
+            setTimeout(() => {
+                modal.classList.add('show');
+            }, 10);
+        }
+
+        function closeModal(e) {
+            // Only close if background overlay or close button is clicked
+            if(e && e.target !== document.getElementById('productModal')) return;
+
+            const modal = document.getElementById('productModal');
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 300); // Matches CSS transition time
         }
 
         // Initialize products on load
         renderProducts('all');
+        renderFeatured();
     </script>
 </body>
 </html>
