@@ -45,11 +45,6 @@
             transition: color 0.3s ease;
         }
 
-        img {
-            max-width: 100%;
-            display: block;
-        }
-
         /* --- Navigation --- */
         header {
             background-color: var(--white);
@@ -190,6 +185,7 @@
             border: 1px solid var(--dark-beige);
         }
 
+        /* Update: Image settings for perfect fit */
         .img-placeholder {
             background-color: var(--beige);
             width: 100%;
@@ -200,6 +196,19 @@
             justify-content: center;
             color: var(--text-light);
             font-size: 14px;
+            overflow: hidden;
+        }
+
+        .img-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.5s ease;
+        }
+        
+        .product-card:hover .img-placeholder img {
+            transform: scale(1.05);
         }
 
         .product-card h3 {
@@ -316,7 +325,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.3);
+            background-color: rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(4px);
             z-index: 1000;
             opacity: 0;
@@ -355,6 +364,7 @@
             color: var(--text-light);
             cursor: pointer;
             transition: color 0.3s ease;
+            z-index: 10;
         }
 
         .close-modal:hover {
@@ -471,7 +481,9 @@
         <section id="about" class="page-section">
             <div class="container about-grid">
                 <div>
-                    <div class="img-placeholder" style="height: 500px;">[ Brand Lifestyle Photo ]</div>
+                    <div class="img-placeholder" style="height: 500px;">
+                        <img src="https://images.unsplash.com/photo-1515562141207-7a8efdb2cebc?auto=format&fit=crop&w=800&q=80" alt="Brand Lifestyle">
+                    </div>
                 </div>
                 <div>
                     <h2 class="section-title" style="text-align: left;">Our Story</h2>
@@ -595,14 +607,14 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // --- Product Data with Added Detail info ---
+        // --- Product Data with Beautiful Image Links ---
         const products = [
-            { id: 1, name: 'Eternity Band', category: 'rings', desc: '18k Solid Gold', fullDesc: 'A continuous circle of brilliant-cut diamonds set in 18k solid gold. Perfect for stacking or wearing on its own.', price: 'Wholesale: $250.00', img: '[ Ring Image ]' },
-            { id: 2, name: 'Pearl Drop Pendant', category: 'necklaces', desc: 'Freshwater Pearl & Gold', fullDesc: 'A delicate 14k gold chain featuring a single, lustrous freshwater pearl drop. Elegant and timeless.', price: 'Wholesale: $110.00', img: '[ Necklace Image ]' },
-            { id: 3, name: 'Minimalist Cuff', category: 'bracelets', desc: 'Sterling Silver', fullDesc: 'A sleek, open-ended cuff crafted from high-polished sterling silver. Adjustable for the perfect fit.', price: 'Wholesale: $85.00', img: '[ Bracelet Image ]' },
-            { id: 4, name: 'Stud Collection', category: 'rings', desc: 'Diamond Accents', fullDesc: 'A versatile set of everyday stud earrings with subtle diamond accents. Hypoallergenic and secure.', price: 'Wholesale: $190.00', img: '[ Earrings Image ]' },
-            { id: 5, name: 'Herringbone Chain', category: 'necklaces', desc: '18k Gold Plated', fullDesc: 'A liquid-like flat herringbone chain that sits perfectly on the collarbone. Tarnish-resistant plating.', price: 'Wholesale: $65.00', img: '[ Necklace Image ]' },
-            { id: 6, name: 'Chain Link Bracelet', category: 'bracelets', desc: 'Solid Brass', fullDesc: 'A bold, vintage-inspired chunky chain link bracelet. Finished with a secure toggle clasp.', price: 'Wholesale: $45.00', img: '[ Bracelet Image ]' }
+            { id: 1, name: 'Eternity Band', category: 'rings', desc: '18k Solid Gold', fullDesc: 'A continuous circle of brilliant-cut diamonds set in 18k solid gold. Perfect for stacking or wearing on its own.', price: 'Wholesale: $250.00', img: '<img src="https://images.unsplash.com/photo-1605100804763-247f67b2540e?auto=format&fit=crop&w=500&q=80" alt="Eternity Band">' },
+            { id: 2, name: 'Pearl Drop Pendant', category: 'necklaces', desc: 'Freshwater Pearl & Gold', fullDesc: 'A delicate 14k gold chain featuring a single, lustrous freshwater pearl drop. Elegant and timeless.', price: 'Wholesale: $110.00', img: '<img src="https://images.unsplash.com/photo-1599643478524-4c7247a835a2?auto=format&fit=crop&w=500&q=80" alt="Pearl Pendant">' },
+            { id: 3, name: 'Minimalist Cuff', category: 'bracelets', desc: 'Sterling Silver', fullDesc: 'A sleek, open-ended cuff crafted from high-polished sterling silver. Adjustable for the perfect fit.', price: 'Wholesale: $85.00', img: '<img src="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?auto=format&fit=crop&w=500&q=80" alt="Minimalist Cuff">' },
+            { id: 4, name: 'Stud Collection', category: 'rings', desc: 'Diamond Accents', fullDesc: 'A versatile set of everyday stud earrings with subtle diamond accents. Hypoallergenic and secure.', price: 'Wholesale: $190.00', img: '<img src="https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=500&q=80" alt="Stud Collection">' },
+            { id: 5, name: 'Herringbone Chain', category: 'necklaces', desc: '18k Gold Plated', fullDesc: 'A liquid-like flat herringbone chain that sits perfectly on the collarbone. Tarnish-resistant plating.', price: 'Wholesale: $65.00', img: '<img src="https://images.unsplash.com/photo-1611085583191-a3b181a8846e?auto=format&fit=crop&w=500&q=80" alt="Herringbone Chain">' },
+            { id: 6, name: 'Chain Link Bracelet', category: 'bracelets', desc: 'Solid Brass', fullDesc: 'A bold, vintage-inspired chunky chain link bracelet. Finished with a secure toggle clasp.', price: 'Wholesale: $45.00', img: '<img src="https://images.unsplash.com/photo-1576402868853-26f63118cf23?auto=format&fit=crop&w=500&q=80" alt="Chain Link Bracelet">' }
         ];
 
         // --- Render Products ---
@@ -621,7 +633,7 @@
         function renderFeatured() {
             const featuredGrid = document.getElementById('featured-grid');
             featuredGrid.innerHTML = '';
-            // Display first 4 products on the home page
+            
             const featured = products.slice(0, 4);
             featured.forEach(p => {
                 featuredGrid.innerHTML += createProductCard(p);
@@ -652,8 +664,8 @@
             const product = products.find(p => p.id === id);
             if(!product) return;
 
-            // Populate Data
-            document.getElementById('modalImg').innerText = product.img;
+            // Populate Data (Including Image HTML)
+            document.getElementById('modalImg').innerHTML = product.img;
             document.getElementById('modalTitle').innerText = product.name;
             document.getElementById('modalDesc').innerText = product.desc;
             document.getElementById('modalFullDesc').innerText = product.fullDesc;
@@ -668,14 +680,13 @@
         }
 
         function closeModal(e) {
-            // Only close if background overlay or close button is clicked
             if(e && e.target !== document.getElementById('productModal')) return;
 
             const modal = document.getElementById('productModal');
             modal.classList.remove('show');
             setTimeout(() => {
                 modal.style.display = 'none';
-            }, 300); // Matches CSS transition time
+            }, 300); 
         }
 
         // Initialize products on load
